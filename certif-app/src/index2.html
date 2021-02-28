@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Web 3 Demo</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.4/web3.min.js'></script>
+</head>
+
+<body>
+
+    Web 3 Demo
+    <br >
+    <button onclick="getCertif();">getCertif</button>
+    <button onclick="getLength();">getLength</button>
+    <button onclick="addCertif();">addCertif</button>
+    <br /><br />
+    Status: <span id="status">Loading...</span>
+
+    <script type="text/javascript">
+        async function loadWeb3() {
+    if (window.ethereum) {
+        window.web3 = new Web3(window.ethereum);
+        window.ethereum.enable();
+    }
+}
+
+async function load() {
+    await loadWeb3();
+    updateStatus('Ready!');
+}
+
+function updateStatus(status) {
+    const statusEl = document.getElementById('status');
+    statusEl.innerHTML = status;
+    console.log(status);
+}
+
+load();
+
+async function loadContract() {
+    return await new window.web3.eth.Contract([
+        {
+          "constant": true,
+          "inputs": [],
+          "name": "getCertif",
+          "outputs": [
+            {
+              "internalType": "string[]",
+              "name": "",
+              "type": "string[]"
+            }
+          ],
+          "payable": false,
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "constant": false,
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "value",
+              "type": "string"
+            }
+          ],
+          "name": "addCertif",
+          "outputs": [],
+          "payable": false,
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "constant": true,
+          "inputs": [],
+          "name": "getLength",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "payable": false,
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ], '0x9600160858C66494C165a719CFdd2578E2E65328');
+}
+
+async function load() {
+    await loadWeb3();
+    window.contract = await loadContract();
+    updateStatus('Ready!');
+}
+
+async function getCertif() {
+    updateStatus('fetching certif...');
+    const getCertif = await window.contract.methods.getCertif().call();
+    updateStatus(`certif: ${getCertif}`);
+}
+
+async function getLength() {
+    updateStatus('fetching certif...');
+    const length = await window.contract.methods.getLength().call();
+    updateStatus(`length: ${length}`);
+}
+
+async function addCertif() {
+    const value = "testtest";
+    updateStatus(`Updating certif with ${value}`);
+    const account = await getCurrentAccount();
+    const certif = await window.contract.methods.addCertif(value).send({ from: account });
+    updateStatus('Updated.');
+}
+
+async function getCurrentAccount() {
+    const accounts = await window.web3.eth.getAccounts();
+    return accounts[0];
+}
+    </script>
+</body>
+
+</html>
